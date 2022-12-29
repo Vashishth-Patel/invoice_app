@@ -1,6 +1,7 @@
-package com.vashishth.invoice.screens
+package com.vashishth.invoice.screens.AddBusiness
 
 
+import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.widget.Toast
@@ -38,14 +39,17 @@ import com.vashishth.invoice.components.AddBtn
 import com.vashishth.invoice.components.SignatureDialog
 import com.vashishth.invoice.model.PathState
 import com.vashishth.invoice.navigation.Screen
-import com.vashishth.invoice.screens.AddCustomer.AllFormEvent
+import com.vashishth.invoice.screens.AddCustomer.businessFormEvent
 import com.vashishth.invoice.screens.viewModels.MainViewModel
+import kotlinx.coroutines.delay
 
 
+@SuppressLint("SuspiciousIndentation")
 @Composable
-fun addBusinessScreen(navController: NavController,viewModel: MainViewModel = hiltViewModel()){
+fun AddBusinessScreen(navController: NavController, viewModel: MainViewModel = hiltViewModel()){
+
     val context = LocalContext.current
-        Surface() {
+        Surface {
             val state = viewModel.businessState1
             LaunchedEffect(key1 = context){
                 viewModel.validationEvents.collect{event ->
@@ -94,7 +98,7 @@ fun addBusinessScreen(navController: NavController,viewModel: MainViewModel = hi
                             )
                         },
                         onValueChange = {
-                            viewModel.onEvent(AllFormEvent.businessNameChanged(it))
+                            viewModel.onBusinessEvent(businessFormEvent.businessNameChanged(it))
                         },
                         label = { Text(text = "Business Name") },
                         placeholder = { Text(text = "Enter Your Business Name") },
@@ -105,13 +109,14 @@ fun addBusinessScreen(navController: NavController,viewModel: MainViewModel = hi
                     )
                     if (state.nameError != null) {
                         Text(
+                            fontSize = 10.sp,
                             text = state.nameError,
                             color = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.align(Alignment.End)
+                            modifier = Modifier.align(Alignment.End).padding(start = 10.dp)
                         )
                     }
                     AddBtn(onClick = {
-                            viewModel.onEvent(AllFormEvent.BusinessNameSubmit)
+                            viewModel.onBusinessEvent(businessFormEvent.BusinessNameSubmit)
                     }, title = "Get Started")
                 }
             }
@@ -121,17 +126,18 @@ fun addBusinessScreen(navController: NavController,viewModel: MainViewModel = hi
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun addBusinessDetailsScreen(navController: NavController,viewModel: MainViewModel = hiltViewModel()){
+fun AddBusinessDetailsScreen(navController: NavController, viewModel: MainViewModel = hiltViewModel()){
+
     val keyboardController = LocalSoftwareKeyboardController.current
     val context = LocalContext.current
-    var namePan = remember { mutableStateOf(true) }
-    var phoneEmail = remember { mutableStateOf(false) }
-    var address = remember { mutableStateOf(false) }
+    val namePan = remember { mutableStateOf(true) }
+    val phoneEmail = remember { mutableStateOf(false) }
+    val address = remember { mutableStateOf(false) }
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(title = { Text("About Business") },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack()}) {
+                    IconButton(onClick = { navController.navigate(Screen.homeScreen.route)}) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
                             contentDescription = "Localized description"
@@ -140,7 +146,7 @@ fun addBusinessDetailsScreen(navController: NavController,viewModel: MainViewMod
                 }
                 )
         }
-    ) {
+    ) { it ->
         val state = viewModel.businessState2
         LaunchedEffect(key1 = context){
             viewModel.validationEvents.collect{event ->
@@ -151,14 +157,15 @@ fun addBusinessDetailsScreen(navController: NavController,viewModel: MainViewMod
                             "BUSINESS DETAILS ADDED",
                             Toast.LENGTH_SHORT
                         ).show()
-                        navController.popBackStack()
+                        delay(1000)
+                        navController.navigate(Screen.homeScreen.route)
                     }
                 }
             }
         }
         Surface(Modifier.padding(it)) {
             val scrollState = rememberScrollState()
-            Column() {
+            Column {
                 Column(
                     Modifier
                         .weight(0.67f)
@@ -168,7 +175,7 @@ fun addBusinessDetailsScreen(navController: NavController,viewModel: MainViewMod
                         shape = RoundedCornerShape(10.dp),
                         shadowElevation = 5.dp
                     ) {
-                        Column() {
+                        Column {
                             Surface(
                                 Modifier
                                     .fillMaxWidth()
@@ -211,8 +218,8 @@ fun addBusinessDetailsScreen(navController: NavController,viewModel: MainViewMod
                                             contentDescription = "Legal Name Icon"
                                         )
                                     },
-                                    onValueChange = {
-                                        viewModel.onEvent(AllFormEvent.legalNameChanged(it))
+                                    onValueChange = {newName ->
+                                        viewModel.onBusinessEvent(businessFormEvent.legalNameChanged(newName))
                                     },
                                     label = { Text(text = "Legal Name Of Business") },
                                     placeholder = { Text(text = "Enter Legal Name Of Business") },
@@ -222,10 +229,10 @@ fun addBusinessDetailsScreen(navController: NavController,viewModel: MainViewMod
                                     )
                                 )
                                 if (state.legalNameError != null) {
-                                    Text(
+                                    Text(modifier = Modifier.align(Alignment.End).padding(start = 10.dp),
+                                        fontSize = 10.sp,
                                         text = state.legalNameError,
                                         color = MaterialTheme.colorScheme.error,
-                                        modifier = Modifier.align(Alignment.End)
                                     )
                                 }
                                 OutlinedTextField(
@@ -233,7 +240,7 @@ fun addBusinessDetailsScreen(navController: NavController,viewModel: MainViewMod
                                         .fillMaxWidth()
                                         .padding(9.dp),
                                     shape = RoundedCornerShape(corner = CornerSize(10.dp)),
-                                    value = if(state.Gstin != null){state.Gstin}else{""},
+                                    value = state.Gstin ?: "",
                                     leadingIcon = {
                                         Icon(
                                             imageVector = Icons.Default.AddBusiness,
@@ -241,7 +248,7 @@ fun addBusinessDetailsScreen(navController: NavController,viewModel: MainViewMod
                                         )
                                     },
                                     onValueChange = {
-                                        viewModel.onEvent(AllFormEvent.GSTINNumberChanged(it))
+                                        viewModel.onBusinessEvent(businessFormEvent.GSTINNumberChanged(it))
                                     },
                                     label = { Text(text = "GSTIN Number") },
                                     placeholder = { Text(text = "Enter GSTIN Nnumber") },
@@ -254,16 +261,17 @@ fun addBusinessDetailsScreen(navController: NavController,viewModel: MainViewMod
                                     Text(
                                         text = state.GstinError,
                                         color = MaterialTheme.colorScheme.error,
-                                        modifier = Modifier.align(Alignment.End)
+                                        modifier = Modifier.align(Alignment.End).padding(start = 10.dp),
+                                        fontSize = 10.sp
                                     )
                                 }
-                                Column() {
+                                Column{
                                     OutlinedTextField(
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .padding(9.dp),
                                         shape = RoundedCornerShape(corner = CornerSize(10.dp)),
-                                        value = if(state.PANNumber != null){state.PANNumber}else{""},
+                                        value = state.PANNumber ?: "",
                                         leadingIcon = {
                                             Icon(
                                                 imageVector = Icons.Default.CreditCard,
@@ -271,7 +279,7 @@ fun addBusinessDetailsScreen(navController: NavController,viewModel: MainViewMod
                                             )
                                         },
                                         onValueChange = {
-                                            viewModel.onEvent(AllFormEvent.PANNumberChanged(it))
+                                            viewModel.onBusinessEvent(businessFormEvent.PANNumberChanged(it))
                                         },
                                         label = { Text(text = "Business PAN Number") },
                                         placeholder = { Text(text = "Enter Business PAN Number") },
@@ -284,7 +292,8 @@ fun addBusinessDetailsScreen(navController: NavController,viewModel: MainViewMod
                                         Text(
                                             text = state.PANNumberError,
                                             color = MaterialTheme.colorScheme.error,
-                                            modifier = Modifier.align(Alignment.End)
+                                            modifier = Modifier.align(Alignment.End).padding(start = 10.dp),
+                                            fontSize = 10.sp
                                         )
                                     }
 
@@ -297,7 +306,7 @@ fun addBusinessDetailsScreen(navController: NavController,viewModel: MainViewMod
                         shape = RoundedCornerShape(10.dp),
                         shadowElevation = 5.dp
                     ) {
-                        Column() {
+                        Column{
                             Surface(
                                 Modifier
                                     .fillMaxWidth()
@@ -345,7 +354,7 @@ fun addBusinessDetailsScreen(navController: NavController,viewModel: MainViewMod
                                         )
                                     },
                                     onValueChange = {
-                                        viewModel.onEvent(AllFormEvent.businessPhoneChanged(it))
+                                        viewModel.onBusinessEvent(businessFormEvent.businessPhoneChanged(it))
                                     },
                                     label = { Text(text = "Business PhoneNumber") },
                                     placeholder = { Text(text = "Enter Business PhoneNumber") },
@@ -358,7 +367,8 @@ fun addBusinessDetailsScreen(navController: NavController,viewModel: MainViewMod
                                     Text(
                                         text = state.phoneNumberError,
                                         color = MaterialTheme.colorScheme.error,
-                                        modifier = Modifier.align(Alignment.End)
+                                        modifier = Modifier.align(Alignment.End).padding(start = 10.dp),
+                                        fontSize = 10.sp
                                     )
                                 }
                                 OutlinedTextField(
@@ -366,7 +376,7 @@ fun addBusinessDetailsScreen(navController: NavController,viewModel: MainViewMod
                                         .fillMaxWidth()
                                         .padding(9.dp),
                                     shape = RoundedCornerShape(corner = CornerSize(10.dp)),
-                                    value = if(state.email != null){state.email}else{""},
+                                    value = state.email ?: "",
                                     leadingIcon = {
                                         Icon(
                                             imageVector = Icons.Default.Email,
@@ -374,7 +384,7 @@ fun addBusinessDetailsScreen(navController: NavController,viewModel: MainViewMod
                                         )
                                     },
                                     onValueChange = {
-                                        viewModel.onEvent(AllFormEvent.businessEmailChanged(it))
+                                        viewModel.onBusinessEvent(businessFormEvent.businessEmailChanged(it))
                                     },
                                     label = { Text(text = "Business Email") },
                                     placeholder = { Text(text = "Enter Business Email") },
@@ -387,7 +397,8 @@ fun addBusinessDetailsScreen(navController: NavController,viewModel: MainViewMod
                                     Text(
                                         text = state.emailError,
                                         color = MaterialTheme.colorScheme.error,
-                                        modifier = Modifier.align(Alignment.End)
+                                        modifier = Modifier.align(Alignment.End).padding(start = 10.dp),
+                                        fontSize = 10.sp
                                     )
                                 }
 
@@ -396,7 +407,7 @@ fun addBusinessDetailsScreen(navController: NavController,viewModel: MainViewMod
                                         .fillMaxWidth()
                                         .padding(9.dp),
                                     shape = RoundedCornerShape(corner = CornerSize(10.dp)),
-                                    value = if(state.website != null){state.website}else{""},
+                                    value = state.website ?: "",
                                     leadingIcon = {
                                         Icon(
                                             imageVector = Icons.Default.Web,
@@ -404,7 +415,7 @@ fun addBusinessDetailsScreen(navController: NavController,viewModel: MainViewMod
                                         )
                                     },
                                     onValueChange = {
-                                        viewModel.onEvent(AllFormEvent.websiteChanged(it))
+                                        viewModel.onBusinessEvent(businessFormEvent.websiteChanged(it))
                                     },
                                     label = { Text(text = "Business Website") },
                                     placeholder = { Text(text = "Enter Business Website") },
@@ -417,7 +428,8 @@ fun addBusinessDetailsScreen(navController: NavController,viewModel: MainViewMod
                                     Text(
                                         text = state.websiteError,
                                         color = MaterialTheme.colorScheme.error,
-                                        modifier = Modifier.align(Alignment.End)
+                                        modifier = Modifier.align(Alignment.End).padding(start = 10.dp),
+                                        fontSize = 10.sp
                                     )
                                 }
                             }
@@ -428,7 +440,7 @@ fun addBusinessDetailsScreen(navController: NavController,viewModel: MainViewMod
                         shape = RoundedCornerShape(10.dp),
                         shadowElevation = 5.dp
                     ) {
-                        Column() {
+                        Column{
                             Surface(
                                 Modifier
                                     .fillMaxWidth()
@@ -476,7 +488,7 @@ fun addBusinessDetailsScreen(navController: NavController,viewModel: MainViewMod
                                         )
                                     },
                                     onValueChange = {
-                                        viewModel.onEvent(AllFormEvent.businessAddressChanged(it))
+                                        viewModel.onBusinessEvent(businessFormEvent.businessAddressChanged(it))
                                     },
                                     label = { Text(text = "Office/Shop Address") },
                                     placeholder = { Text(text = "Enter Office/Shop Address") },
@@ -489,7 +501,8 @@ fun addBusinessDetailsScreen(navController: NavController,viewModel: MainViewMod
                                     Text(
                                         text = state.addressError,
                                         color = MaterialTheme.colorScheme.error,
-                                        modifier = Modifier.align(Alignment.End)
+                                        modifier = Modifier.align(Alignment.End).padding(start = 10.dp),
+                                        fontSize = 10.sp
                                     )
                                 }
                                 OutlinedTextField(
@@ -497,7 +510,7 @@ fun addBusinessDetailsScreen(navController: NavController,viewModel: MainViewMod
                                         .fillMaxWidth()
                                         .padding(9.dp),
                                     shape = RoundedCornerShape(corner = CornerSize(10.dp)),
-                                    value = if(state.PINCode != null){state.PINCode}else{""},
+                                    value = state.PINCode ?: "",
                                     leadingIcon = {
                                         Icon(
                                             imageVector = Icons.Default.Pin,
@@ -506,7 +519,7 @@ fun addBusinessDetailsScreen(navController: NavController,viewModel: MainViewMod
                                     },
                                     //trailingIcon = { Icon(imageVector = Icons.Default.Add, contentDescription = null) },
                                     onValueChange = {
-                                        viewModel.onEvent(AllFormEvent.PINCodeChanged(it))
+                                        viewModel.onBusinessEvent(businessFormEvent.PINCodeChanged(it))
                                     },
                                     label = { Text(text = "PIN Code") },
                                     placeholder = { Text(text = "Enter PIN Code") },
@@ -519,7 +532,8 @@ fun addBusinessDetailsScreen(navController: NavController,viewModel: MainViewMod
                                     Text(
                                         text = state.PINCodeError,
                                         color = MaterialTheme.colorScheme.error,
-                                        modifier = Modifier.align(Alignment.End)
+                                        modifier = Modifier.align(Alignment.End).padding(start = 10.dp),
+                                        fontSize = 10.sp
                                     )
                                 }
                                 OutlinedTextField(
@@ -527,7 +541,7 @@ fun addBusinessDetailsScreen(navController: NavController,viewModel: MainViewMod
                                         .fillMaxWidth()
                                         .padding(9.dp),
                                     shape = RoundedCornerShape(corner = CornerSize(10.dp)),
-                                    value = if(state.state!=null){state.state}else{""},
+                                    value = state.state ?: "",
                                     leadingIcon = {
                                         Icon(
                                             imageVector = Icons.Default.MyLocation,
@@ -535,7 +549,7 @@ fun addBusinessDetailsScreen(navController: NavController,viewModel: MainViewMod
                                         )
                                     },
                                     onValueChange = {
-                                        viewModel.onEvent(AllFormEvent.StateChanged(it))
+                                        viewModel.onBusinessEvent(businessFormEvent.StateChanged(it))
                                     },
                                     label = { Text(text = "State") },
                                     placeholder = { Text(text = "Enter State") },
@@ -549,7 +563,7 @@ fun addBusinessDetailsScreen(navController: NavController,viewModel: MainViewMod
                                         .fillMaxWidth()
                                         .padding(9.dp),
                                     shape = RoundedCornerShape(corner = CornerSize(10.dp)),
-                                    value = if(state.city != null){state.city}else{""},
+                                    value = state.city ?: "",
                                     leadingIcon = {
                                         Icon(
                                             imageVector = Icons.Default.LocationCity,
@@ -557,7 +571,7 @@ fun addBusinessDetailsScreen(navController: NavController,viewModel: MainViewMod
                                         )
                                     },
                                     onValueChange = {
-                                        viewModel.onEvent(AllFormEvent.CityChanged(it))
+                                        viewModel.onBusinessEvent(businessFormEvent.CityChanged(it))
                                     },
                                     label = { Text(text = "City") },
                                     placeholder = { Text(text = "Enter City") },
@@ -571,17 +585,21 @@ fun addBusinessDetailsScreen(navController: NavController,viewModel: MainViewMod
                     }
                 }
 
-                Column (Modifier.weight(0.33f)){
+                Column (Modifier.weight(0.25f)){
                     Row(
                         Modifier
                             .fillMaxWidth()
                             .padding(10.dp), horizontalArrangement = Arrangement.End
                     ) {
                         Column(horizontalAlignment = Alignment.End) {
-                            if (viewModel.businessSign.isNotEmpty()) {
+                            val signList = viewModel.signList.collectAsState().value
+                            if (signList.isNotEmpty()) {
                                 Image(
-                                    modifier = Modifier.size(80.dp),
-                                    bitmap = toBitmap1(viewModel.businessSign.last().signature).asImageBitmap(),
+                                    modifier = Modifier
+                                        .size(80.dp)
+                                        .weight(0.5f)
+                                        .padding(end = 20.dp),
+                                    bitmap = toBitmap1(signList.last().signature).asImageBitmap(),
                                     contentDescription = ""
                                 )
                             }
@@ -589,9 +607,12 @@ fun addBusinessDetailsScreen(navController: NavController,viewModel: MainViewMod
                         }
                     }
 
+                }
+                Column(Modifier.weight(0.12f)) {
                     AddBtn(Modifier.fillMaxWidth(),
                         onClick = {
-                            viewModel.onEvent(AllFormEvent.BusinessDetailSubmit)
+                            viewModel.onBusinessEvent(businessFormEvent.BusinessDetailSubmit)
+
                         },
                         title = "SAVE DETAILS",
                         shape = RoundedCornerShape(10.dp))
@@ -606,6 +627,7 @@ fun addBusinessDetailsScreen(navController: NavController,viewModel: MainViewMod
         return BitmapFactory.decodeByteArray(byteArray,0,byteArray.size)
     }
 
+@SuppressLint("MutableCollectionMutableState")
 @ExperimentalComposeUiApi
 @Composable
 fun CaptureSignature(viewModel : MainViewModel) {
@@ -633,7 +655,9 @@ fun CaptureSignature(viewModel : MainViewModel) {
 
     AddBtn(modifier = Modifier
         .height(70.dp)
-        .width(130.dp),onClick = { isDialogOpen.value = true }, title = "Signature")
+        .width(130.dp),
+        fontSize = 18.sp,
+        onClick = { isDialogOpen.value = true }, title = "Signature")
 
 }
 

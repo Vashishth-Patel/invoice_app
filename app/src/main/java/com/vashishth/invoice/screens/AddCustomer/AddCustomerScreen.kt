@@ -1,5 +1,6 @@
 package com.vashishth.invoice.screens
 
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CornerSize
@@ -11,6 +12,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -22,12 +24,14 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.vashishth.invoice.components.AddBtn
-import com.vashishth.invoice.screens.AddCustomer.AllFormEvent
+import com.vashishth.invoice.screens.AddCustomer.CustomerFormEvent
 import com.vashishth.invoice.screens.viewModels.MainViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddCustomerScreen(navController: NavController){
+fun AddCustomerScreen(navController: NavController,viewModel : MainViewModel = hiltViewModel()){
+    val customers  = viewModel.customerList.collectAsState().value
+    val context = LocalContext.current
     Scaffold(topBar = {
         CenterAlignedTopAppBar(
             title = { Text("Add Customer") },
@@ -50,16 +54,34 @@ fun AddCustomerScreen(navController: NavController){
         )
     }
     ){
-        addScreen(contentPaddingValues = it, navController = navController, viewModel = hiltViewModel())
+        addScreen(contentPaddingValues = it, navController = navController, viewModel = viewModel,context = context){
+            if(!customers.any {
+                    it.name.uppercase() == viewModel.state.name.uppercase().replace(" ","") && it.phoneNumber == viewModel.state.phone?.toLong()
+                }){
+                viewModel.onEvent(CustomerFormEvent.CustomerSubmit)
+            }else{
+                Toast.makeText(
+                    context,
+                    "Customer already exist",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
     }
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun addScreen(contentPaddingValues: PaddingValues,navController: NavController,viewModel: MainViewModel){
+fun addScreen(contentPaddingValues: PaddingValues,
+              navController: NavController,
+              viewModel: MainViewModel,
+              context: Context,
+              onClick : () -> Unit
+
+){
     val state = viewModel.state
     val keyboardController = LocalSoftwareKeyboardController.current
-    val context = LocalContext.current
+
     Surface(Modifier.padding(contentPaddingValues)) {
         LaunchedEffect(key1 = context){
             viewModel.validationEvents.collect{event ->
@@ -98,7 +120,7 @@ fun addScreen(contentPaddingValues: PaddingValues,navController: NavController,v
                         },
                         //trailingIcon = { Icon(imageVector = Icons.Default.Add, contentDescription = null) },
                         onValueChange = {
-                            viewModel.onEvent(AllFormEvent.nameChanged(it))
+                            viewModel.onEvent(CustomerFormEvent.nameChanged(it))
                         },
                         label = { Text(text = "Customer Name") },
                         placeholder = { Text(text = "Enter Customer Name") },
@@ -124,7 +146,7 @@ fun addScreen(contentPaddingValues: PaddingValues,navController: NavController,v
                         },
                         //trailingIcon = { Icon(imageVector = Icons.Default.Add, contentDescription = null) },
                         onValueChange = {
-                            viewModel.onEvent(AllFormEvent.phoneChanged(it))
+                            viewModel.onEvent(CustomerFormEvent.phoneChanged(it))
                         },
                         label = { Text(text = "Customer Phone") },
                         placeholder = { Text(text = "Enter Customer Phonenumber") },
@@ -150,7 +172,7 @@ fun addScreen(contentPaddingValues: PaddingValues,navController: NavController,v
                         },
                         //trailingIcon = { Icon(imageVector = Icons.Default.Add, contentDescription = null) },
                         onValueChange = {
-                            viewModel.onEvent(AllFormEvent.emailChanged(it))
+                            viewModel.onEvent(CustomerFormEvent.emailChanged(it))
                         },
                         label = { Text(text = "Customer Email") },
                         placeholder = { Text(text = "Enter Customer Email") },
@@ -168,7 +190,7 @@ fun addScreen(contentPaddingValues: PaddingValues,navController: NavController,v
 
             }
             AddBtn(onClick = {
-                viewModel.onEvent(AllFormEvent.CustomerSubmit)
+                onClick.invoke()
             }, title = "Save")
         }
     }

@@ -4,27 +4,25 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.vashishth.invoice.R
 import com.vashishth.invoice.components.*
-import com.vashishth.invoice.model.BottomNavItem
 import com.vashishth.invoice.model.btnHomeModel
 import com.vashishth.invoice.navigation.Screen
+import com.vashishth.invoice.screens.AddBusiness.AddBusinessScreen
 import com.vashishth.invoice.screens.viewModels.MainViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -47,7 +45,6 @@ fun hScreen(navController: NavController,viewModel: MainViewModel){
 
     Scaffold(
         bottomBar = { BottomBar(navController = navController as NavHostController)
-//
         },
         floatingActionButton = {
             MultiFloatingButton(multiFloatingState = multiFloatingState, onMultiFabChange = {multiFloatingState = it}, items = items1,navController)
@@ -56,7 +53,7 @@ fun hScreen(navController: NavController,viewModel: MainViewModel){
         if(viewModel.checkBusinessName() > 0) {
             hmScreen(contentPaddingValues = it, navController, hiltViewModel())
         }else{
-            addBusinessScreen(navController)
+            AddBusinessScreen(navController)
         }
     }
 }
@@ -66,7 +63,7 @@ fun HomeScreen(navController: NavController,viewModel : MainViewModel = hiltView
     if(viewModel.checkBusinessName() > 0) {
         hScreen(navController = navController,viewModel)
     }else{
-        addBusinessScreen(navController)
+        AddBusinessScreen(navController)
     }
 }
 
@@ -78,9 +75,10 @@ fun hmScreen(contentPaddingValues: PaddingValues,navController: NavController,vi
     ("Sales","this week's sale"),btnHomeModel
     ("Invoices","list of invoices"))
 
-    Surface(Modifier.padding(contentPaddingValues)) {
+    Surface(Modifier.padding(contentPaddingValues).fillMaxSize()) {
         Column(
-            verticalArrangement = Arrangement.SpaceAround
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             LazyVerticalGrid(
                 modifier = Modifier.padding(top = 30.dp),
@@ -101,8 +99,12 @@ fun hmScreen(contentPaddingValues: PaddingValues,navController: NavController,vi
                 }
             }
             businessDetailCard(navController = navController, viewModel = viewModel)
-            Spacer(modifier = Modifier.weight(1f))
-
+            AddBtn(modifier = Modifier.fillMaxWidth(0.7f),
+                fontSize = 20.sp,
+                elevation = 5.dp,
+                shape = RoundedCornerShape(18.dp),
+                onClick = { navController.navigate(Screen.GenerateInvoiceScreen.route) },
+                title = "Generate Invoice")
         }
     }
 }

@@ -6,9 +6,7 @@ import java.util.*
 
 @Entity
 data class Product(
-    @PrimaryKey(autoGenerate = false)
     val itemName : String,
-    val itemNumber : Int?,
     val price : Double,
     val unit : String,
     val hsnNumber : Int?,
@@ -17,4 +15,14 @@ data class Product(
     val stockAddDate : Date,
     val purchasePrice : Double,
     val description : String?
+){
+    @PrimaryKey(autoGenerate = true)
+    var itemNumber : Int = 0
+}
+
+data class itemView(
+    val itemName: String,
+    val price: Double,
+    val unit: String,
+    val stock: Int
 )

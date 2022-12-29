@@ -7,7 +7,7 @@ import com.vashishth.invoice.data.entity.*
 
 
 @Database(
-    entities = [Product::class, Invoice::class, Customer::class,InvoiceItem::class,Business::class,Address::class,BusinessDetail::class,BusinessLogo::class,BusinessSign::class],
+    entities = [Product::class, Invoice::class, Customer::class,InvoiceItem::class,Business::class,Address::class,BusinessDetail::class,BusinessLogo::class,BusinessSign::class,Cart::class],
     version = 1
 )
 @TypeConverters(Converters::class)

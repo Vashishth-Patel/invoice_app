@@ -1,10 +1,7 @@
 package com.vashishth.invoice.model
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.*
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.vashishth.invoice.navigation.Screen
 
@@ -28,10 +25,10 @@ sealed class BottomNavItem(
         route = Screen.itemListScreen.route,
         Icon = Icons.Filled.ShoppingCart
     )
-    object Settings : BottomNavItem(
-        name = "Settings",
-        route = Screen.settingsScreen.route,
-        Icon = Icons.Filled.Settings
+    object BusinessDetails : BottomNavItem(
+        name = "About",
+        route = Screen.updateBusinessDetailsScreen.route,
+        Icon = Icons.Filled.Business
     )
 }
 

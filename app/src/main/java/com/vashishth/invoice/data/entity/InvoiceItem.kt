@@ -6,7 +6,9 @@ import androidx.room.PrimaryKey
 @Entity
 data class InvoiceItem(
     @PrimaryKey(autoGenerate = true)
+    val lineNo : Int = 0,
     val invoiceNumber : Int,
     val itemName : String,
-    val quantity : Int
+    var quantity : Int,
+    val unitPrice : Double
 )

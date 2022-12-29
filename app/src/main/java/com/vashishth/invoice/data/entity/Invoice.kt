@@ -11,5 +11,5 @@ data class Invoice(
     val entryDate: Date = Date.from(Instant.now())
 ){
     @PrimaryKey(autoGenerate = true)
-    var invoiceNumber: Int = 1
+    var invoiceNumber: Int = 0
 }

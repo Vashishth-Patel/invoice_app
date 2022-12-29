@@ -17,7 +17,8 @@ val green30 = Color(0xFF08f14f)
 val green40 = Color(0xFF05ac38)
 val green50 = Color(0xFF036722)
 
-
+val mattRed = Color(0xFFC40233)
+val mattGreen = Color(0xFF48A14D)
 
 val peel0 = Color(0xFF41e8d3)
 val darkpeel10 = Color(0xFF76eedf)

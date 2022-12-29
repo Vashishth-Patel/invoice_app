@@ -8,8 +8,8 @@ import com.vashishth.invoice.data.entity.Product
 data class ProductWithInvoiceItems(
     @Embedded val product: Product,
     @Relation(
-        parentColumn = "itemNumber",
-        entityColumn = "itemNumber"
+        parentColumn = "itemName",
+        entityColumn = "itemName"
     )
     val invoiceItems : List<InvoiceItem>
 )

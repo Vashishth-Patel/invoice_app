@@ -23,12 +23,13 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.TileMode
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vashishth.invoice.ui.theme.*
-
 
 @Composable
 fun TextCard(
@@ -74,11 +75,12 @@ fun AddBtn(
     title:String,
     backGroundColor: Color = blueBtn,
     elevation: Dp = 0.dp,
+    fontSize: TextUnit = 20.sp,
     borderStroke: BorderStroke = BorderStroke(1.dp, blue30),
     shape: Shape = RoundedCornerShape(corner = CornerSize(35.dp))
 ){
     Surface(modifier = modifier
-        .padding(all = 15.dp)
+        .padding(all = 16.dp)//15.dp
         .height(60.dp)
         .width(160.dp)
         .clickable { onClick.invoke() },
@@ -87,7 +89,32 @@ fun AddBtn(
         color = backGroundColor,
         shadowElevation = elevation) {
         Row(Modifier.padding(5.dp),verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
-            Text(text = title, modifier = modifier.padding(0.dp), textAlign = TextAlign.Center, color = darkblue40)
+            Text(text = title, modifier = modifier.padding(0.dp), fontSize = fontSize, textAlign = TextAlign.Center, color = darkblue40)
+        }
+    }
+}
+@Composable
+fun AddBtnIcon(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+    icon : ImageVector,
+    tint : Color,
+    title:String,
+    backGroundColor: Color = blueBtn,
+    elevation: Dp = 0.dp,
+    shape: Shape = RoundedCornerShape(corner = CornerSize(35.dp))
+){
+    Surface(modifier = modifier
+        .padding(all = 15.dp)
+        .height(60.dp)
+        .width(160.dp)
+        .clickable { onClick.invoke() },
+        shape = shape,
+        color = backGroundColor,
+        shadowElevation = elevation) {
+        Row(Modifier.padding(5.dp),verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceEvenly) {
+            Icon(imageVector = icon, contentDescription = "icons button", tint = tint)
+            Text(text = title, fontSize = 20.sp, modifier = modifier.padding(0.dp), textAlign = TextAlign.Center, color = tint)
         }
     }
 }
